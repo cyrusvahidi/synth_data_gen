@@ -30,6 +30,26 @@ SynthDef(\synth, {
 }).add;
 )
 
+// Env([0, 1, 0.5, 0.5, 0], [0.5, 1, 0, 1], -4).plot
+// Env([0, 20000, 0], [0.05, 1, 0.5], -4).plot // fenv
+
+
+a = Synth(\synth, [\out, 0, \atk, 0, \dcy, 2, \rls, 0, \cutoff, 5000, \lfo_rate, 0.5, \mix, 0.5]);
+
+// Audition
+(
+var env = List[0.05, 1, 0.5, 0.5, 0.5]; // atk, dcy, rls, sustain, sustain_level
+var flag = 1; // 1 == lfo
+var lfo_rate = 0.5;
+var f_env = List[0, 20000, 0];
+Synth(\synth, [
+	\atk, env[0], \dcy, env[1], \rls, env[2], \sustain, env[3], \sustain_level, env[4],
+	\use_lfo, flag,
+	\lfo_rate, lfo_rate,
+	\f_start, f_env[0], \f_max, f_env[1], \f_end, f_env[2],
+]);
+)
+
 (
 var envs = List[List[0, 1, 1], List[0, 0.5, 1.5], List[0.5, 1, 0.5], List[1, 0.8, 0.2]];
 var lfo_rates = List[0.5, 2];
