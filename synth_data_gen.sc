@@ -4,9 +4,13 @@ thisProcess.platform.recordingsDir = "/Users/cyrus/Documents/AIM/projects/data/"
 
 (
 SynthDef(\synth, {
-	|out=0, f0=440, atk=0.01, dcy=1, rls=1, cutoff=1000, mix=0, lfo_rate=0.5, use_lfo=1,
+	|out=0, f0=440,
+	atk=0.01, dcy=1, sustain=0, sustain_lvl=0.5, rls=1,
+	cutoff=1000,
+	mix=0,
+	lfo_rate=0.5, use_lfo=1,
 	f_start=0, f_max=1000, f_end=0|
-	var osc1, osc2, f_lfo, f_env, f_mod;
+	var osc1, osc2, f_lfo, f_env, f_mod, env;
 
 	// oscillators
 	osc1 = Pulse.ar(f0, mul: 1 - mix);
@@ -18,14 +22,13 @@ SynthDef(\synth, {
 	// choose filter modulation source via flag
 	f_mod = if (use_lfo, f_lfo, f_env);
 
-	x = MoogFF.ar(osc1 + osc2, f_mod, gain: 2) * EnvGen.ar(Env.adsr(atk, dcy, 0, rls, curve: 2), doneAction: Done.freeSelf);
+	env = EnvGen.ar(Env([0, 1, sustain_lvl, sustain_lvl, 0], [atk, dcy, sustain, rls], -4));
+	// EnvGen.ar(Env.adsr(atk, dcy, 0, rls, curve: 2), doneAction: Done.freeSelf)
+	x = MoogFF.ar(osc1 + osc2, f_mod, gain: 2) * env;
 
 	Out.ar(out, x!2);
 }).add;
 )
-
-
-a = Synth(\synth, [\out, 0, \atk, 0, \dcy, 2, \rls, 0, \cutoff, 5000, \lfoRate, 0.5, \mix, 0.5]);
 
 (
 var envs = List[List[0, 1, 1], List[0, 0.5, 1.5], List[0.5, 1, 0.5], List[1, 0.8, 0.2]];
